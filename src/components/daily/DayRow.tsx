@@ -1,10 +1,15 @@
 "use client"
 import { useState } from "react"
-import type { DailySummary } from "@/types/rescuetime"
+import type { DailySummary, HourlyEntry, Highlight } from "@/types/rescuetime"
 import { formatHours, formatDate, formatPct } from "@/lib/format"
 import { getPulseColor, PRODUCTIVITY_COLORS } from "@/lib/colors"
+import DayTimeline from "./DayTimeline"
 
-export default function DayRow({ day }: { day: DailySummary }) {
+export default function DayRow({ day, hourlyData, highlights }: {
+  day: DailySummary
+  hourlyData?: HourlyEntry[]
+  highlights?: Highlight[]
+}) {
   const [open, setOpen] = useState(false)
   const color = getPulseColor(day.productivity_pulse)
 
@@ -33,23 +38,36 @@ export default function DayRow({ day }: { day: DailySummary }) {
       </button>
       <div className={`expand-grid ${open ? "open" : ""}`}>
         <div>
-          <div className="grid grid-cols-2 gap-3 px-4 pb-4 sm:grid-cols-5">
-            {[
-              { label: "Tres productif", hours: day.very_productive_hours, pct: day.very_productive_percentage, color: PRODUCTIVITY_COLORS.veryProductive },
-              { label: "Productif", hours: day.productive_hours, pct: day.productive_percentage, color: PRODUCTIVITY_COLORS.productive },
-              { label: "Neutre", hours: day.neutral_hours, pct: day.neutral_percentage, color: PRODUCTIVITY_COLORS.neutral },
-              { label: "Distrayant", hours: day.distracting_hours, pct: day.distracting_percentage, color: PRODUCTIVITY_COLORS.distracting },
-              { label: "Tres distrayant", hours: day.very_distracting_hours, pct: day.very_distracting_percentage, color: PRODUCTIVITY_COLORS.veryDistracting },
-            ].map((cat) => (
-              <div key={cat.label} className="rounded-lg bg-white/5 p-2">
-                <div className="flex items-center gap-1.5">
-                  <div className="h-1.5 w-1.5 rounded-full" style={{ backgroundColor: cat.color }} />
-                  <span className="text-[10px] text-zinc-500">{cat.label}</span>
+          <div className="flex flex-col gap-3 px-4 pb-4">
+            {hourlyData && hourlyData.length > 0 && (
+              <DayTimeline date={day.date} hourlyData={hourlyData} />
+            )}
+            <div className="grid grid-cols-2 gap-3 sm:grid-cols-5">
+              {[
+                { label: "Tres productif", hours: day.very_productive_hours, pct: day.very_productive_percentage, color: PRODUCTIVITY_COLORS.veryProductive },
+                { label: "Productif", hours: day.productive_hours, pct: day.productive_percentage, color: PRODUCTIVITY_COLORS.productive },
+                { label: "Neutre", hours: day.neutral_hours, pct: day.neutral_percentage, color: PRODUCTIVITY_COLORS.neutral },
+                { label: "Distrayant", hours: day.distracting_hours, pct: day.distracting_percentage, color: PRODUCTIVITY_COLORS.distracting },
+                { label: "Tres distrayant", hours: day.very_distracting_hours, pct: day.very_distracting_percentage, color: PRODUCTIVITY_COLORS.veryDistracting },
+              ].map((cat) => (
+                <div key={cat.label} className="rounded-lg bg-white/5 p-2">
+                  <div className="flex items-center gap-1.5">
+                    <div className="h-1.5 w-1.5 rounded-full" style={{ backgroundColor: cat.color }} />
+                    <span className="text-[10px] text-zinc-500">{cat.label}</span>
+                  </div>
+                  <div className="mt-1 text-sm text-white">{formatHours(cat.hours)}</div>
+                  <div className="text-[10px] text-zinc-600">{formatPct(cat.pct)}</div>
                 </div>
-                <div className="mt-1 text-sm text-white">{formatHours(cat.hours)}</div>
-                <div className="text-[10px] text-zinc-600">{formatPct(cat.pct)}</div>
+              ))}
+            </div>
+            {highlights && highlights.length > 0 && (
+              <div className="flex flex-col gap-1.5 rounded-lg bg-white/5 p-3">
+                <span className="text-[10px] font-medium text-zinc-500">Notes</span>
+                {highlights.map((h) => (
+                  <p key={h.id} className="text-xs text-zinc-300">{h.description}</p>
+                ))}
               </div>
-            ))}
+            )}
           </div>
         </div>
       </div>

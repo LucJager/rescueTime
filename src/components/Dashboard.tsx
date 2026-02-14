@@ -3,6 +3,8 @@ import { useState } from "react"
 import type { TabId } from "@/types/rescuetime"
 import { useDailySummary } from "@/hooks/useDailySummary"
 import { useAnalyticData } from "@/hooks/useAnalyticData"
+import { useHourlyData } from "@/hooks/useHourlyData"
+import { useHighlights } from "@/hooks/useHighlights"
 import TabBar from "./TabBar"
 import OverviewTab from "./overview/OverviewTab"
 import DailyTab from "./daily/DailyTab"
@@ -20,8 +22,10 @@ export default function Dashboard() {
       return d.toISOString().split("T")[0]
     })(),
   })
+  const { hourlyData, loading: hourlyLoading } = useHourlyData()
+  const { data: highlights, loading: highlightsLoading } = useHighlights()
 
-  const loading = daysLoading || prodLoading || actLoading
+  const loading = daysLoading || prodLoading || actLoading || hourlyLoading || highlightsLoading
 
   return (
     <div className="mx-auto max-w-4xl px-4 py-8">
@@ -44,8 +48,8 @@ export default function Dashboard() {
 
       {!loading && !daysError && days && (
         <>
-          {activeTab === "overview" && <OverviewTab days={days} productivityData={prodData} />}
-          {activeTab === "daily" && <DailyTab days={days} />}
+          {activeTab === "overview" && <OverviewTab days={days} productivityData={prodData} hourlyData={hourlyData} />}
+          {activeTab === "daily" && <DailyTab days={days} hourlyData={hourlyData} highlights={highlights ?? undefined} />}
           {activeTab === "activities" && <ActivitiesTab activities={actData} />}
         </>
       )}

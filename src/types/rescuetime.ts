@@ -21,6 +21,18 @@ export interface DailySummary {
   neutral_duration_formatted: string
   distracting_duration_formatted: string
   very_distracting_duration_formatted: string
+  // Category hours
+  software_development_hours: number
+  communication_and_scheduling_hours: number
+  social_networking_hours: number
+  design_and_composition_hours: number
+  entertainment_hours: number
+  news_hours: number
+  reference_and_learning_hours: number
+  shopping_hours: number
+  business_hours: number
+  utilities_hours: number
+  uncategorized_hours: number
 }
 
 export interface AnalyticResponse {
@@ -35,6 +47,20 @@ export interface ActivityData {
   name: string
   category: string
   productivity: number
+}
+
+export interface HourlyEntry {
+  date: string
+  seconds: number
+  productivity: number
+}
+
+export interface Highlight {
+  id: number
+  date: string
+  description: string
+  created_at: string
+  updated_at: string
 }
 
 export type TabId = "overview" | "daily" | "activities"
